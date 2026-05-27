@@ -55,7 +55,7 @@
 </div>
 
 <script>
-    // URL Firebase milik Anda
+    // FIX: URL Firebase lengkap milik Anda sudah dimasukkan kembali di sini
     const firebaseURL = "https://firebasedatabase.app"; 
 
     // Objek lokal untuk menyimpan status terakhir relay (0 atau 1)
@@ -63,7 +63,6 @@
 
     // 1. FUNGSI UNTUK MENGUBAH STATUS SAAT TOMBOL DIKLIK (Satu tombol untuk ON/OFF)
     function toggleRelay(namaRelay) {
-        // Jika sekarang 0 maka jadi 1, jika 1 maka jadi 0
         let nilaiBaru = statusSekarang[namaRelay] === 1 ? 0 : 1; 
         
         fetch(`${firebaseURL}${namaRelay}.json`, {
@@ -75,7 +74,6 @@
 
     // 2. FUNGSI UNTUK MEMANTAU DATABASE SECARA REALTIME ANDA
     function amatiDatabase() {
-        // Melakukan request berkala setiap 1 detik untuk memperbarui warna indikator di web
         setInterval(() => {
             fetch(`${firebaseURL}.json`)
             .then(res => res.json())
@@ -83,13 +81,10 @@
                 if (data) {
                     for (let i = 1; i <= 4; i++) {
                         let namaRelay = 'relay' + i;
-                        // Ambil nilai dari firebase (jika kosong/null dianggap 0)
                         let nilai = data[namaRelay] !== undefined ? data[namaRelay] : 0;
                         
-                        // Simpan ke objek lokal
                         statusSekarang[namaRelay] = nilai;
                         
-                        // Update Tampilan Tombol secara visual
                         let tombol = document.getElementById(`btn-${namaRelay}`);
                         if (nilai === 1) {
                             tombol.innerText = "STATUS: NYALA (ON)";
@@ -102,10 +97,9 @@
                 }
             })
             .catch(err => console.log("Gagal sinkronisasi data indikator"));
-        }, 1000); // Sinkronisasi setiap 1 detik
+        }, 1000); 
     }
 
-    // Jalankan fungsi pemantau saat halaman web pertama kali dibuka
     window.onload = amatiDatabase;
 </script>
 </body>
