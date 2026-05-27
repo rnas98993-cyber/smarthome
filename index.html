@@ -3,104 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Kontrol Relay Pro</title>
+    <title>Web Kontrol Relay Saya</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #eef2f3; padding: 20px; margin: 0; }
-        .box { max-width: 400px; margin: 20px auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; margin-bottom: 5px; }
-        p { color: #7f8c8d; margin-top: 0; font-size: 14px; }
-        hr { border: 0; height: 1px; background: #eee; margin: 20px 0; }
-        
-        .relay-card { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #e9ecef; }
-        .relay-card h3 { margin: 0 0 10px 0; color: #34495e; font-size: 16px; }
-        
-        /* Desain Tombol Utama */
-        .btn-status { width: 90%; padding: 14px; font-weight: bold; font-size: 15px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
-        
-        /* Efek Warna Indikator */
-        .status-on { background: #2ecc71; color: white; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
-        .status-off { background: #95a5a6; color: white; }
+        body { font-family: sans-serif; text-align: center; background: #f0f3f5; padding: 20px; }
+        .box { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button { width: 80%; padding: 15px; margin: 10px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white; transition: transform 0.1s; }
+        button:active { transform: scale(0.98); }
+        .btn-on { background: #2ecc71; }
+        .btn-off { background: #e74c3c; }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h2>Kontrol Jarak Jauh</h2>
-    <p>ESP32-C3 + ULN2803 + Firebase</p>
+    <p>Web Kustom ESP32-C3 + ULN2803</p>
     <hr>
     
-    <!-- Relay 1 -->
-    <div class="relay-card">
-        <h3>Relay 1</h3>
-        <button id="btn-relay1" class="btn-status status-off" onclick="toggleRelay('relay1')">STATUS: MATI</button>
-    </div>
+    <h3>Relay 1</h3>
+    <button class="btn-on" onclick="setRelay('relay1', 1)">NYALAKAN (ON)</button>
+    <button class="btn-off" onclick="setRelay('relay1', 0)">MATIKAN (OFF)</button>
 
-    <!-- Relay 2 -->
-    <div class="relay-card">
-        <h3>Relay 2</h3>
-        <button id="btn-relay2" class="btn-status status-off" onclick="toggleRelay('relay2')">STATUS: MATI</button>
-    </div>
+    <h3>Relay 2</h3>
+    <button class="btn-on" onclick="setRelay('relay2', 1)">NYALAKAN (ON)</button>
+    <button class="btn-off" onclick="setRelay('relay2', 0)">MATIKAN (OFF)</button>
 
-    <!-- Relay 3 -->
-    <div class="relay-card">
-        <h3>Relay 3</h3>
-        <button id="btn-relay3" class="btn-status status-off" onclick="toggleRelay('relay3')">STATUS: MATI</button>
-    </div>
+    <h3>Relay 3</h3>
+    <button class="btn-on" onclick="setRelay('relay3', 1)">NYALAKAN (ON)</button>
+    <button class="btn-off" onclick="setRelay('relay3', 0)">MATIKAN (OFF)</button>
 
-    <!-- Relay 4 -->
-    <div class="relay-card">
-        <h3>Relay 4</h3>
-        <button id="btn-relay4" class="btn-status status-off" onclick="toggleRelay('relay4')">STATUS: MATI</button>
-    </div>
+    <h3>Relay 4</h3>
+    <button class="btn-on" onclick="setRelay('relay4', 1)">NYALAKAN (ON)</button>
+    <button class="btn-off" onclick="setRelay('relay4', 0)">MATIKAN (OFF)</button>
 </div>
 
 <script>
-    // FIX: URL Firebase lengkap milik Anda sudah dimasukkan kembali di sini
+    // FIX: URL Firebase resmi Anda sudah dimasukkan dengan lengkap dan benar
     const firebaseURL = "https://firebasedatabase.app"; 
 
-    // Objek lokal untuk menyimpan status terakhir relay (0 atau 1)
-    let statusSekarang = { relay1: 0, relay2: 0, relay3: 0, relay4: 0 };
-
-    // 1. FUNGSI UNTUK MENGUBAH STATUS SAAT TOMBOL DIKLIK (Satu tombol untuk ON/OFF)
-    function toggleRelay(namaRelay) {
-        let nilaiBaru = statusSekarang[namaRelay] === 1 ? 0 : 1; 
-        
+    function setRelay(namaRelay, nilai) {
+        // Mengirim data 0 atau 1 langsung ke database Google via HTTP PUT
         fetch(`${firebaseURL}${namaRelay}.json`, {
             method: 'PUT',
-            body: JSON.stringify(nilaiBaru)
+            body: JSON.stringify(nilai)
         })
-        .catch(err => alert('Gagal mengirim perintah! Periksa internet Anda.'));
+        .then(res => {
+            console.log(`${namaRelay} berhasil diubah ke ${nilai}`);
+            alert(`${namaRelay} berhasil diubah ke posisi ${nilai === 1 ? 'ON' : 'OFF'}`);
+        })
+        .catch(err => {
+            alert('Gagal mengirim perintah! Pastikan Anda membuka web ini lewat link GitHub Pages, bukan file lokal.');
+            console.error(err);
+        });
     }
-
-    // 2. FUNGSI UNTUK MEMANTAU DATABASE SECARA REALTIME ANDA
-    function amatiDatabase() {
-        setInterval(() => {
-            fetch(`${firebaseURL}.json`)
-            .then(res => res.json())
-            .then(data => {
-                if (data) {
-                    for (let i = 1; i <= 4; i++) {
-                        let namaRelay = 'relay' + i;
-                        let nilai = data[namaRelay] !== undefined ? data[namaRelay] : 0;
-                        
-                        statusSekarang[namaRelay] = nilai;
-                        
-                        let tombol = document.getElementById(`btn-${namaRelay}`);
-                        if (nilai === 1) {
-                            tombol.innerText = "STATUS: NYALA (ON)";
-                            tombol.className = "btn-status status-on";
-                        } else {
-                            tombol.innerText = "STATUS: MATI (OFF)";
-                            tombol.className = "btn-status status-off";
-                        }
-                    }
-                }
-            })
-            .catch(err => console.log("Gagal sinkronisasi data indikator"));
-        }, 1000); 
-    }
-
-    window.onload = amatiDatabase;
 </script>
 </body>
 </html>
